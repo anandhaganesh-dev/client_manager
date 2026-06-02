@@ -1,9 +1,12 @@
+import os
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-DATABASE__URL = "postgresql://postgres:@localhost:5432/client_manager"
+load_dotenv()
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-engine = create_engine(DATABASE__URL)
+engine = create_engine(DATABASE_URL)
 
 SessionLocal = sessionmaker(
     autoflush = False,
