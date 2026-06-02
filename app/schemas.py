@@ -13,3 +13,8 @@ class ClientResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class ClientUpdate(BaseModel):
+    name: str | None = None
+    email: EmailStr | None = None
+    company: str | None = None
