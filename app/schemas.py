@@ -42,4 +42,5 @@ class ProjectUpdate(BaseModel):
     title: str | None = None
     description: str | None = None
     budget: float | None = None
+    status: ProjectStatus | None = None
     client_id: int | None = None

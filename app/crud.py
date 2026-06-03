@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from fastapi import HTTPException
 from .models import Client, Project
 from .schemas import ClientCreate, ClientUpdate, ProjectCreate, ProjectUpdate
 
@@ -99,10 +100,27 @@ def get_project_by_id(
     )
 
 def update_project(db: Session, project_id: int, project_update: ProjectUpdate):
-    project = db.query(Project).filter(Project.id==project_id).first()
+    project = db.query(Project).filter(Project.id == project_id).first()
 
     if project is None:
         return None
+    
+    if (
+        project_update.client_id is not None
+    ):
+        client = (
+            db.query(Client)
+            .filter(
+                Client.id == project_update.client_id
+            )
+            .first()
+        )
+
+        if client is None:
+            raise HTTPException(
+                status_code=404,
+                detail="Client not found"
+            )
     
     update_data = project_update.model_dump(exclude_unset=True)
 
