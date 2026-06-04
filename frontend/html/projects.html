@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <h1>Freelance Projects Manager</h1>
+
+    <nav>
+        <a href="index.html">Clients</a>
+        <a href="projects.html">Projects</a>
+    </nav>
+
+    <h2>Add Project</h2>
+
+    <form id="project-form">
+
+        <input type="text"
+        id="title"
+        placeholder="Title"
+        required>
+
+        <input type="text"
+        id="description"
+        placeholder="Description"
+        required>
+        
+        <input type="number"
+        id="budget"
+        placeholder="Budget in ₹"
+        required>
+
+        <button type="submit">
+            Add Project
+        </button>
+
+    </form>
+
+    <hr>
+
+    <div id="projects-container">
+
+    </div>
+
+    <script src="../js/projects.js"></script>
+
+</body>
+</html>

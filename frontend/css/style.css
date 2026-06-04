@@ -8,7 +8,18 @@ body {
     margin-top: 20px;
 }
 
+#projects-container {
+    margin-top: 20px;
+}
+
 .client-card {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+}
+
+.project-card {
     border: 1px solid #ccc;
     padding: 15px;
     margin-bottom: 10px;

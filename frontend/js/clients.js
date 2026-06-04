@@ -1,3 +1,5 @@
+alert("JS loaded")
+
 const container = document.getElementById("clients-container");
 const form = document.getElementById("client-form");
 

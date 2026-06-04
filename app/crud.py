@@ -74,6 +74,9 @@ def create_project(db: Session, project_data= ProjectCreate):
 
     return project
 
+def get_projects(db):
+    return db.query(Project).all()
+
 def get_client_projects(
     db: Session,
     client_id: int

@@ -33,7 +33,7 @@ class ProjectResponse(BaseModel):
     description:str | None = None
     budget: float
     status: ProjectStatus
-    client_id: int
+    client_id: int | None = None
 
     class Config:
         from_attributes = True

@@ -24,10 +24,19 @@ def create_client(
 def get_clients(
     db: Session=Depends(get_db)
 ):
-    client = crud.get_clients(db)
-    if client is None:
+    clients = crud.get_clients(db)
+    if clients is None:
         raise HTTPException(status_code=404,detail="Client Not Found")
-    return client
+    return clients
+
+@app.get("/projects", response_model=list[ProjectResponse])
+def get_projects(
+    db: Session=Depends(get_db)
+):
+    projects = crud.get_projects(db)
+    if projects is None:
+        raise HTTPException(status_code=404,detail="Project Not Found")
+    return projects
 
 @app.get("/client/{client_id}", response_model=ClientResponse)
 def get_client_by_id(client_id:int, db:Session=Depends(get_db)
