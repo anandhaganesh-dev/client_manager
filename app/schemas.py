@@ -30,10 +30,10 @@ class ProjectCreate(BaseModel):
 class ProjectResponse(BaseModel):
     id:int
     title:str
-    description:str | None = None
+    description:str
     budget: float
     status: ProjectStatus
-    client_id: int | None = None
+    client_id: int 
 
     class Config:
         from_attributes = True

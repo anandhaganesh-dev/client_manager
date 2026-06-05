@@ -1,6 +1,9 @@
+let editingProjectId = null;
+let projectsData = [];
+
 const container = document.getElementById("projects-container");
 const form = document.getElementById("project-form");
-
+const submitButton = document.getElementById("submit-btn-project")
 
 
 async function getProjects() {
@@ -10,6 +13,7 @@ async function getProjects() {
     );
 
     const projects = await response.json();
+    projectsData = projects;
 
     container.innerHTML = "";
 
@@ -24,6 +28,9 @@ async function getProjects() {
         <p>${project.description}</p>
         <p>${project.budget}</p>
 
+        <button onclick="editProject(${project.id})">
+        Edit </button>
+
         <button onclick="deleteProject(${project.id})">
         Delete </button>
         `;
@@ -35,23 +42,39 @@ async function getProjects() {
 
 getProjects();
 
-form.addEventListener("submit", createProject);
+form.addEventListener("submit", handleProjectSubmit);
 
-async function createProject(event) {
+async function handleProjectSubmit(event) {
 
     event.preventDefault();
 
     const title = document.getElementById("title").value;
-
+    
     const description = document.getElementById("description").value;
 
     const budget = document.getElementById("budget").value;
+
+    const status = document.getElementById("status").value;
+
+    const clientId = document.getElementById("client-id").vlaue;
     
     const projectData = {
-        title,description,budget
+        title,description,budget,status,clientId: parseInt(clientId)
     };
 
-    await fetch(
+    if (editingProjectId) {
+        await fetch(
+        `http://127.0.0.1:8000/project/${editingProjectId}`,
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(projectData)
+        }
+    );
+    } else {
+        await fetch(
         `http://127.0.0.1:8000/project`,
         {
             method: "POST",
@@ -61,6 +84,11 @@ async function createProject(event) {
             body: JSON.stringify(projectData)
         }
     );
+    }
+
+    editingProjectId = null;
+
+    submitButton.textContent = "Add Project"
 
     form.reset();
 
@@ -87,3 +115,41 @@ async function deleteProject(projectId) {
     await getProjects();
     
 }
+
+function editProject(id) {
+    const project = projectsData.find(
+        project => project.id === id
+    );
+    
+    document.getElementById("title").value = project.title;
+    document.getElementById("description").value = project.description;
+    document.getElementById("budget").value = project.budget;
+
+    editingProjectId = project.id;
+
+    submitButton.textContent = "Update Project";
+}
+
+async function loadClientsDropdown() {
+
+    const response = await fetch(
+        "http://127.0.0.1:8000/clients"
+    );
+
+    const clients = await response.json();
+
+    const select = document.getElementById("client-id");
+
+    select.innerHTML = "";
+
+    clients.forEach(client =>{
+        const option = document.createElement("option");
+
+        option.value = client.id;
+        option.textContent = `${client.company} (${client.name})`;
+
+        select.appendChild(option);
+    });
+}
+
+loadClientsDropdown();

@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from .models import Client, Project
-from .schemas import ClientCreate, ClientUpdate, ProjectCreate, ProjectUpdate
+from .schemas import ClientCreate, ClientUpdate, ProjectCreate, ProjectUpdate, ProjectStatus
 
 def client_create(db: Session, client = ClientCreate):
     db_client = Client(
@@ -48,6 +48,12 @@ def delete_client(db: Session, client_id: int):
 
     if client is None:
         return None
+    
+    for project in client.projects:
+        if project.status in [ProjectStatus.PENDING,
+                              ProjectStatus.IN_PROGRESS]:
+            raise HTTPException(status_code=400,
+                                detail=("Cannot Delete Client with Active Projects"))
     
     db.delete(client)
     db.commit()
@@ -102,11 +108,39 @@ def get_project_by_id(
         .first()
     )
 
+def validate_status_transition(
+        old_status: ProjectStatus,
+        new_status: ProjectStatus
+):
+    
+    if old_status == new_status:
+        return
+    
+    allowed_transitions ={
+        ProjectStatus.PENDING: [
+            ProjectStatus.IN_PROGRESS,
+            ProjectStatus.CANCELLED
+        ],
+        ProjectStatus.IN_PROGRESS: [
+            ProjectStatus.COMPLETED,
+            ProjectStatus.CANCELLED
+        ],
+        ProjectStatus.COMPLETED:[],
+        ProjectStatus.CANCELLED:[]
+    }
+
+    if new_status not in allowed_transitions[old_status]:
+        raise HTTPException(status_code=400, detail="Invalid Status Transition")
+
+
 def update_project(db: Session, project_id: int, project_update: ProjectUpdate):
     project = db.query(Project).filter(Project.id == project_id).first()
 
     if project is None:
         return None
+
+    if project_update.status is not None:
+        validate_status_transition(project.status, project_update.status)
     
     if (
         project_update.client_id is not None

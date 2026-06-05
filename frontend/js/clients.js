@@ -1,8 +1,9 @@
-alert("JS loaded")
+let editingClientId = null;
+let clientsData = [];
 
 const container = document.getElementById("clients-container");
 const form = document.getElementById("client-form");
-
+const submitButton = document.getElementById("submit-btn-client");
 
 
 async function getClients() {
@@ -12,6 +13,7 @@ async function getClients() {
     );
 
     const clients = await response.json();
+    clientsData = clients;
 
     container.innerHTML = "";
 
@@ -26,6 +28,9 @@ async function getClients() {
         <p>${client.email}</p>
         <p>${client.company}</p>
 
+        <button onclick="editClient(${client.id})">
+        Edit </button>
+
         <button onclick="deleteClient(${client.id})">
         Delete </button>
         `;
@@ -37,9 +42,9 @@ async function getClients() {
 
 getClients();
 
-form.addEventListener("submit", createClient);
+form.addEventListener("submit", handleClientSubmit);
 
-async function createClient(event) {
+async function handleClientSubmit(event) {
 
     event.preventDefault();
 
@@ -53,7 +58,19 @@ async function createClient(event) {
         name, email, company
     };
 
-    await fetch(
+    if (editingClientId) {
+        await fetch(
+        `http://127.0.0.1:8000/client/${editingClientId}`,
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(clientData)
+        }
+    );
+    } else {
+        await fetch(
         `http://127.0.0.1:8000/client`,
         {
             method: "POST",
@@ -63,6 +80,11 @@ async function createClient(event) {
             body: JSON.stringify(clientData)
         }
     );
+    }
+
+    editingClientId = null;
+
+    submitButton.textContent = "Add Client";
 
     form.reset();
 
@@ -89,3 +111,18 @@ async function deleteClient(clientId) {
     await getClients();
     
 }
+
+function editClient(id) {
+    const client = clientsData.find(
+        client => client.id === id
+    );
+    
+    document.getElementById("name").value = client.name;
+    document.getElementById("email").value = client.email;
+    document.getElementById("company").value = client.company;
+
+    editingClientId = client.id;
+
+    submitButton.textContent = "Update Client";
+}
+

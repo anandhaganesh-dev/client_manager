@@ -99,10 +99,10 @@ def get_client_projects(
 
 @app.put("/project/{project_id}", response_model=ProjectResponse)
 def update_project(project_id:int,
-                  project_updata: ProjectUpdate,
+                  project_update: ProjectUpdate,
                   db: Session=Depends(get_db)
                   ):
-    project = crud.update_project(db,project_id,project_updata)
+    project = crud.update_project(db,project_id,project_update)
     if project is None:
         raise HTTPException(status_code=404,detail="Project Not Found")
     return project
